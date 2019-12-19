@@ -1,20 +1,38 @@
+# Copyright 2018 The Texar Authors. All Rights Reserved.
 #
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """ loader for switch board dataset.
 """
 import os
-from json_lines import reader
 import json
+from json_lines import reader
 
 from nltk.tokenize import WordPunctTokenizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-import texar as tx
+import texar.tf as tx
 
 from config_data import data_root
 
+# pylint: disable=invalid-name, too-many-locals
+
 wnd_sz = 10
 
-class Dataset():
+
+class Dataset(object):
+    """Data preprocessor.
+    """
+
     def __init__(self, jsonl_path, mode=None):
         self.mode = mode
         self.raw = []
@@ -27,8 +45,8 @@ class Dataset():
                 dialog = []
                 for utts in context:
                     p = utts.find(':')
-                    dialog.append(((utts[p-1] == 'A') * 2 - 1,
-                                  utts[p + 2:-1], 0))
+                    dialog.append((
+                        (utts[p - 1] == 'A') * 2 - 1, utts[p + 2:-1], 0))
 
                 if dialog[0][1][-1] == '>':
                     dialog = dialog[1:]
@@ -36,10 +54,8 @@ class Dataset():
                 if len(dialog) == 0:
                     continue
 
-                responses = [] 
+                responses = []
                 for resp in item['responses']:
-                    #if resp[0] == ')':
-                    #    resp = resp[2:]
                     responses.append(resp)
 
                 spk = (item['speaker'] == 'A') * 2 - 1
@@ -68,13 +84,13 @@ class Dataset():
                                  for speaker, sentence, _ in utts])
 
                 lst = [(idx, start, start + wnd_sz)
-                       for start in range(0, len(utts)-wnd_sz)] + \
+                       for start in range(0, len(utts) - wnd_sz)] + \
                       [(idx, 0, end)
-                       for end in range(2, min(wnd_sz+1, len(utts)))]
+                       for end in range(2, min(wnd_sz + 1, len(utts)))]
 
                 self.lst += lst
 
-        self.refs = [['none']] * len(self.lst) 
+        self.refs = [['none']] * len(self.lst)
 
     def __len__(self):
         return len(self.lst)
@@ -98,11 +114,12 @@ class Dataset():
 
     def get(self, idx):
         idx, start, end = self.lst[idx]
-        source = self.raw[idx][start:end-1]
-        target = self.raw[idx][end-1]
+        source = self.raw[idx][start:end - 1]
+        target = self.raw[idx][end - 1]
         source = ' '.join([b for a, b, c in source])
-        cct = self.raw[idx][end-2][0] == self.raw[idx][end-1][0]
+        cct = self.raw[idx][end - 2][0] == self.raw[idx][end - 1][0]
         return self.topics[idx], cct, source, target
+
 
 def sw1c2r(data_root):
     dts_train = Dataset(os.path.join(data_root, 'train.jsonl'))
@@ -115,8 +132,8 @@ def sw1c2r(data_root):
     }
     return datasets
 
-def generate_reference_for_test_dialog(dataset, data_root):
 
+def generate_reference_for_test_dialog(dataset, data_root):
     vocab = {}
     with open(os.path.join(data_root, 'vocab.txt'), 'r') as f:
         p = f.read().splitlines()
@@ -176,13 +193,14 @@ def generate_reference_for_test_dialog(dataset, data_root):
 
         dts_test.refs.append(refs)
 
+
 def download_and_process(data_root):
     if not os.path.isdir(data_root):
         os.makedirs(data_root)
         os.makedirs(os.path.join(data_root, 'raw'))
 
         tx.data.maybe_download(
-            urls='https://drive.google.com/file/d/1Gytd-SSetUkIY6aVVKNrBOxkHjAlSGeU/view?usp=sharing', 
+            urls='https://drive.google.com/file/d/1Gytd-SSetUkIY6aVVKNrBOxkHjAlSGeU/view?usp=sharing',
             path='./',
             filenames=os.path.join(data_root, 'sw1c2r.tar.gz'),
             extract=True)
@@ -218,6 +236,7 @@ def download_and_process(data_root):
 
             with open(os.path.join(data_root, '{}-target-refs.txt'.format(stage)), 'w') as f:
                 f.write('\n'.join(['|||'.join(v) for v in dts.refs]))
+
 
 if __name__ == '__main__':
     download_and_process(data_root)

@@ -13,15 +13,12 @@
 # limitations under the License.
 """Preparing the SST2 dataset.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import os
 import re
-from io import open # pylint: disable=redefined-builtin
+from io import open  # pylint: disable=redefined-builtin
 import tensorflow as tf
-import texar as tx
+import texar.tf as tx
 
 # pylint: disable=invalid-name, too-many-locals
 
@@ -43,6 +40,7 @@ def clean_sst_text(text):
     text = re.sub(r"\s{2,}", " ", text)
     return text.strip().lower()
 
+
 def transform_raw_sst(data_path, raw_fn, new_fn):
     """Transforms the raw data format to a new format.
     """
@@ -62,6 +60,7 @@ def transform_raw_sst(data_path, raw_fn, new_fn):
             fout_y.write(label + '\n')
 
     return fout_x_name, fout_y_name
+
 
 def prepare_data(data_path):
     """Preprocesses SST2 data.
@@ -88,8 +87,10 @@ def prepare_data(data_path):
 
     tf.logging.info('Preprocessing done: {}'.format(data_path))
 
+
 def _main(_):
     prepare_data(FLAGS.data_path)
+
 
 if __name__ == '__main__':
     tf.logging.set_verbosity(tf.logging.INFO)

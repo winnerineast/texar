@@ -41,9 +41,6 @@ To run:
 
 $ python lm_ptb.py --data_path=simple-examples/data --config=config_small
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 # pylint: disable=invalid-name, no-member, too-many-locals
 
@@ -51,7 +48,7 @@ import time
 import importlib
 import numpy as np
 import tensorflow as tf
-import texar as tx
+import texar.tf as tx
 
 from ptb_reader import prepare_data, ptb_iterator
 
@@ -67,6 +64,7 @@ flags.DEFINE_string("config", "config_small", "The config to use.")
 FLAGS = flags.FLAGS
 
 config = importlib.import_module(FLAGS.config)
+
 
 def _main(_):
     # Data
@@ -96,7 +94,7 @@ def _main(_):
             decoding_strategy="train_greedy",
             impute_finished=True,
             inputs=emb_inputs,
-            sequence_length=[num_steps]*batch_size,
+            sequence_length=[num_steps] * batch_size,
             initial_state=initial_state)
 
     # Losses & train ops
@@ -123,12 +121,13 @@ def _main(_):
         }
         if is_train:
             fetches["train_op"] = train_op
+            epoch_size = (len(data["train_text_id"]) // batch_size - 1)\
+                // num_steps
 
         mode = (tf.estimator.ModeKeys.TRAIN
                 if is_train
                 else tf.estimator.ModeKeys.EVAL)
 
-        epoch_size = (len(data) // batch_size - 1) // num_steps
         for step, (x, y) in enumerate(data_iter):
             feed_dict = {
                 inputs: x, targets: y, global_step: epoch,
@@ -144,9 +143,9 @@ def _main(_):
             iters += num_steps
 
             ppl = np.exp(loss / iters)
-            if verbose and step % (epoch_size // 10) == 10:
+            if verbose and is_train and step % (epoch_size // 10) == 10:
                 print("%.3f perplexity: %.3f speed: %.0f wps" %
-                      (step * 1.0 / epoch_size, ppl,
+                      ((step + 1) * 1.0 / epoch_size, ppl,
                        iters * batch_size / (time.time() - start_time)))
 
         ppl = np.exp(loss / iters)
@@ -174,6 +173,7 @@ def _main(_):
             data["test_text_id"], batch_size, num_steps)
         test_ppl = _run_epoch(sess, test_data_iter, 0)
         print("Test Perplexity: %.3f" % (test_ppl))
+
 
 if __name__ == '__main__':
     tf.app.run(main=_main)

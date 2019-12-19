@@ -14,15 +14,11 @@
 """ Language Modeling example using torchtext
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import time
 import importlib
 import numpy as np
 import tensorflow as tf
-import texar as tx
+import texar.tf as tx
 
 from torchtext import data
 from torchtext import datasets

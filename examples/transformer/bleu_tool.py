@@ -26,11 +26,6 @@ Usage: python bleu_tool.py --translation=my-wmt13.de --reference=wmt13_deen.de
 # BLEU score will be similar to the one obtained using: mteval-v14.pl
 # Note:compound splitting is not implemented in this module
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 from argparse import ArgumentParser
 from io import open
 import collections
@@ -132,7 +127,12 @@ def compute_bleu(reference_corpus,
 
     if use_bp:
         ratio = translation_length / reference_length
-        bp = math.exp(1 - 1. / ratio) if ratio < 1.0 else 1.0
+        if ratio <= 0:
+            bp = 0
+        elif ratio < 1.0:
+            bp = math.exp(1 - 1. / ratio)
+        else:
+            bp = 1.0
     bleu = geo_mean * bp
     return np.float32(bleu)
 
@@ -147,9 +147,10 @@ class UnicodeRegex(object):
         self.symbol_re = re.compile("([" + self.property_chars("S") + "])")
 
     def property_chars(self, prefix):
-        #pylint:disable=no-self-use
-        return "".join(six.unichr(x) for x in range(sys.maxunicode) \
-            if unicodedata.category(six.unichr(x)).startswith(prefix))
+        # pylint:disable=no-self-use
+        return "".join(six.unichr(x) for x in range(sys.maxunicode)
+                       if unicodedata.category(
+            six.unichr(x)).startswith(prefix))
 
 
 uregex = UnicodeRegex()

@@ -1,10 +1,11 @@
 """Configurations of Transformer model
 """
 import copy
+import texar.tf as tx
 
 random_seed = 1234
 beam_width = 5
-alpha = 0.6 
+length_penalty = 0.6
 hidden_dim = 512
 
 emb = {
@@ -19,8 +20,18 @@ emb = {
     }
 }
 
+position_embedder_hparams = {
+    'dim': hidden_dim
+}
+
 encoder = {
     'dim': hidden_dim,
+    'num_blocks': 6,
+    'multihead_attention': {
+        'num_heads': 8,
+        'output_dim': hidden_dim
+        # See documentation for more optional hyperparameters
+    },
     'initializer': {
         'type': 'variance_scaling_initializer',
         'kwargs': {
@@ -29,6 +40,8 @@ encoder = {
             'distribution': 'uniform',
         },
     },
+    'poswise_feedforward': tx.modules.default_transformer_poswise_net_hparams(
+        output_dim=hidden_dim)
 }
 
 decoder = copy.deepcopy(encoder)

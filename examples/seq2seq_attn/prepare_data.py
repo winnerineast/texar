@@ -14,7 +14,7 @@
 """Downloads data.
 """
 import tensorflow as tf
-import texar as tx
+import texar.tf as tx
 
 # pylint: disable=invalid-name
 
@@ -24,13 +24,14 @@ flags.DEFINE_string("data", "iwslt14", "Data to download [iwslt14|toy_copy]")
 
 FLAGS = flags.FLAGS
 
+
 def prepare_data():
     """Downloads data.
     """
     if FLAGS.data == 'iwslt14':
         tx.data.maybe_download(
             urls='https://drive.google.com/file/d/'
-                 '1Vuv3bed10qUxrpldHdYoiWLzPKa4pNXd/view?usp=sharing',
+                 '1y4mUWXRS2KstgHopCS9koZ42ENOh6Yb9/view?usp=sharing',
             path='./',
             filenames='iwslt14.zip',
             extract=True)
@@ -44,10 +45,12 @@ def prepare_data():
     else:
         raise ValueError('Unknown data: {}'.format(FLAGS.data))
 
+
 def main():
     """Entrypoint.
     """
     prepare_data()
+
 
 if __name__ == '__main__':
     main()

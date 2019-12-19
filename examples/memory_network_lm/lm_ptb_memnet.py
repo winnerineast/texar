@@ -32,16 +32,13 @@ $ python lm_ptb_memnet.py --data_path=simple-examples/data \
 This code will automatically save and restore from directory `ckpt/`.
 If the directory doesn't exist, it will be created automatically.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 # pylint: disable=invalid-name, no-member, too-many-locals
 
 import importlib
 import numpy as np
 import tensorflow as tf
-import texar as tx
+import texar.tf as tx
 
 from ptb_reader import prepare_data
 from ptb_reader import ptb_iterator_memnet as ptb_iterator
@@ -58,6 +55,7 @@ flags.DEFINE_string("config", "config", "The config to use.")
 FLAGS = flags.FLAGS
 
 config = importlib.import_module(FLAGS.config)
+
 
 def _main(_):
     # Data
@@ -136,7 +134,7 @@ def _main(_):
         try:
             saver.restore(sess, "ckpt/model.ckpt")
             print('restored checkpoint.')
-        except:
+        except BaseException:
             print('restore checkpoint failed.')
 
         last_valid_ppl = None
@@ -166,7 +164,7 @@ def _main(_):
                 try:
                     saver.save(sess, "ckpt/model.ckpt")
                     print("saved checkpoint.")
-                except:
+                except BaseException:
                     print("save checkpoint failed.")
 
             # Valid
@@ -179,9 +177,9 @@ def _main(_):
             if last_valid_ppl:
                 if heuristic_lr_decay:
                     if valid_ppl > last_valid_ppl * config.heuristic_threshold:
-                        lr /= 1. + (valid_ppl / last_valid_ppl \
+                        lr /= 1. + (valid_ppl / last_valid_ppl
                                     - config.heuristic_threshold) \
-                                   * config.heuristic_rate
+                              * config.heuristic_rate
                     last_valid_ppl = last_valid_ppl \
                                      * (1 - config.heuristic_smooth_rate) \
                                      + valid_ppl * config.heuristic_smooth_rate
@@ -201,6 +199,6 @@ def _main(_):
         test_ppl = _run_epoch(sess, test_data_iter, 0)
         print("Test Perplexity: {:.3f}".format(test_ppl))
 
+
 if __name__ == '__main__':
     tf.app.run(main=_main)
-

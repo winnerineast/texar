@@ -33,12 +33,12 @@ embedder = {
 # --------------------- Encoder --------------------- #
 encoder = {
     'rnn_cell_fw': {
-        'type': 'BasicLSTMCell',
+        'type': 'LSTMCell',
         'kwargs': {
             'num_units': num_units,
             'forget_bias': 1.0,
             'activation': None,
-            # Other arguments go here for tf.contrib.rnn.BasicLSTMCell
+            # Other arguments go here for tf.nn.rnn_cell.LSTMCell
             # ...
         },
         'num_layers': 1,
@@ -78,12 +78,12 @@ encoder = {
 # --------------------- Decoder --------------------- #
 decoder = {
     'rnn_cell': {
-        'type': 'BasicLSTMCell',
+        'type': 'LSTMCell',
         'kwargs': {
             'num_units': num_units,
             'forget_bias': 1.0,
             'activation': None,
-            # Other arguments go here for tf.contrib.rnn.BasicLSTMCell
+            # Other arguments go here for tf.nn.rnn_cell.LSTMCell
             # ...
         },
         'num_layers': 1,
@@ -124,4 +124,22 @@ decoder = {
     'max_decoding_length_train': None,
     'max_decoding_length_infer': None,
     'name': 'attention_rnn_decoder'
+}
+# --------------------- Optimization --------------------- #
+opt = {
+    'optimizer': {
+        'type':  'AdamOptimizer',
+        'kwargs': {
+            'learning_rate': 0.001,
+            # Other keyword arguments for the optimizer class
+        },
+    },
+    'learning_rate_decay': {
+        # Hyperparameters of learning rate decay
+    },
+    'gradient_clip': {
+        # Hyperparameters of gradient clipping
+    },
+    'gradient_noise_scale': None,
+    'name': None
 }

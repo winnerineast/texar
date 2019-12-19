@@ -17,12 +17,13 @@
 
 # pylint: disable=invalid-name, too-few-public-methods, missing-docstring
 
-num_epochs = 50
+dataset = "ptb"
+num_epochs = 100
 hidden_size = 256
-dec_keep_prob_in = 0.5
-dec_keep_prob_out = 0.5
-enc_keep_prob_in = 1.0
-enc_keep_prob_out = 1.0
+dec_dropout_in = 0.5
+dec_dropout_out = 0.5
+enc_dropout_in = 0.
+enc_dropout_out = 0.
 word_keep_prob = 0.5
 batch_size = 32
 embed_dim = 256
@@ -31,14 +32,13 @@ latent_dims = 32
 
 lr_decay_hparams = {
     "init_lr": 0.001,
-    "threshold": 5,
-    "rate": 0.5
+    "threshold": 2,
+    "decay_factor": 0.5,
+    "max_decay": 5
 }
 
 
-decoder_hparams = {
-    "type": "lstm"
-}
+decoder_type = 'lstm'
 
 enc_cell_hparams = {
     "type": "LSTMBlockCell",
@@ -46,7 +46,7 @@ enc_cell_hparams = {
         "num_units": hidden_size,
         "forget_bias": 0.
     },
-    "dropout": {"output_keep_prob": enc_keep_prob_out},
+    "dropout": {"output_keep_prob": 1. - enc_dropout_out},
     "num_layers": 1
 }
 
@@ -56,14 +56,15 @@ dec_cell_hparams = {
         "num_units": hidden_size,
         "forget_bias": 0.
     },
-    "dropout": {"output_keep_prob": dec_keep_prob_out},
+    "dropout": {"output_keep_prob": 1. - dec_dropout_out},
     "num_layers": 1
 }
 
-emb_hparams = {
+enc_emb_hparams = {
     'name': 'lookup_table',
     "dim": embed_dim,
-    'initializer' : {
+    "dropout_rate": enc_dropout_in,
+    'initializer': {
         'type': 'random_normal_initializer',
         'kwargs': {
             'mean': 0.0,
@@ -72,11 +73,23 @@ emb_hparams = {
     }
 }
 
+dec_emb_hparams = {
+    'name': 'lookup_table',
+    "dim": embed_dim,
+    "dropout_rate": dec_dropout_in,
+    'initializer': {
+        'type': 'random_normal_initializer',
+        'kwargs': {
+            'mean': 0.0,
+            'stddev': embed_dim**-0.5,
+        },
+    }
+}
 
 # KL annealing
-kl_anneal_hparams={
+kl_anneal_hparams = {
     "warm_up": 10,
-    "start": 0.01
+    "start": 0.1
 }
 
 train_data_hparams = {

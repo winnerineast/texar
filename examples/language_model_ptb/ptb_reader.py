@@ -13,9 +13,6 @@
 # limitations under the License.
 """Utilities for preprocessing and iterating over the PTB data.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 # pylint: disable=invalid-name, too-many-locals
 
@@ -24,7 +21,8 @@ import numpy as np
 
 import tensorflow as tf
 
-import texar as tx
+import texar.tf as tx
+
 
 def ptb_iterator(data, batch_size, num_steps):
     """Iterates through the ptb data.
@@ -32,7 +30,7 @@ def ptb_iterator(data, batch_size, num_steps):
     data_length = len(data)
     batch_length = data_length // batch_size
 
-    data = np.asarray(data[:batch_size*batch_length])
+    data = np.asarray(data[:batch_size * batch_length])
     data = data.reshape([batch_size, batch_length])
 
     epoch_size = (batch_length - 1) // num_steps
@@ -40,9 +38,10 @@ def ptb_iterator(data, batch_size, num_steps):
         raise ValueError("epoch_size == 0, decrease batch_size or num_steps")
 
     for i in range(epoch_size):
-        x = data[:, i * num_steps : (i+1) * num_steps]
-        y = data[:, i * num_steps + 1 : (i+1) * num_steps + 1]
+        x = data[:, i * num_steps: (i + 1) * num_steps]
+        y = data[:, i * num_steps + 1: (i + 1) * num_steps + 1]
         yield (x, y)
+
 
 def prepare_data(data_path):
     """Preprocess PTB data.

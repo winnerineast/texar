@@ -13,9 +13,10 @@
 # limitations under the License.
 """Downloads data.
 """
-import texar as tx
+import texar.tf as tx
 
 # pylint: disable=invalid-name
+
 
 def prepare_data():
     """Downloads data.
@@ -27,10 +28,12 @@ def prepare_data():
         filenames='yelp.zip',
         extract=True)
 
+
 def main():
     """Entrypoint.
     """
     prepare_data()
+
 
 if __name__ == '__main__':
     main()

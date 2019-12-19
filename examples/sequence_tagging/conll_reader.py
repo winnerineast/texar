@@ -13,9 +13,6 @@
 # limitations under the License.
 """Utilities for preprocessing and iterating over the CoNLL 2003 data.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import re
 from collections import defaultdict
@@ -178,7 +175,8 @@ def construct_init_word_vecs(vocab, word_vecs, glove_dict):
             embedding = glove_dict[word]
         elif word.lower() in glove_dict:
             embedding = glove_dict[word.lower()]
-        else: embedding = None
+        else:
+            embedding = None
 
         if embedding is not None:
             word_vecs[index] = embedding

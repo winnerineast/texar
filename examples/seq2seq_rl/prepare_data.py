@@ -14,7 +14,7 @@
 """Downloads data.
 """
 import tensorflow as tf
-import texar as tx
+import texar.tf as tx
 
 # pylint: disable=invalid-name
 
@@ -23,6 +23,7 @@ flags = tf.flags
 flags.DEFINE_string("data", "iwslt14", "Data to download [iwslt14|toy_copy]")
 
 FLAGS = flags.FLAGS
+
 
 def prepare_data():
     """Downloads data.
@@ -44,10 +45,12 @@ def prepare_data():
     else:
         raise ValueError('Unknown data: {}'.format(FLAGS.data))
 
+
 def main():
     """Entrypoint.
     """
     prepare_data()
+
 
 if __name__ == '__main__':
     main()

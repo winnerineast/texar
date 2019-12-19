@@ -26,9 +26,6 @@ Train the model with the cmd:
 
 $ python main.py --config config
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 # pylint: disable=invalid-name, too-many-locals, too-many-arguments, no-member
 
@@ -36,7 +33,7 @@ import os
 import importlib
 import numpy as np
 import tensorflow as tf
-import texar as tx
+import texar.tf as tx
 
 from ctrl_gen_model import CtrlGenModel
 
@@ -47,6 +44,7 @@ flags.DEFINE_string('config', 'config', 'The config to use.')
 FLAGS = flags.FLAGS
 
 config = importlib.import_module(FLAGS.config)
+
 
 def _main(_):
     # Data
@@ -137,7 +135,7 @@ def _main(_):
                 # Writes samples
                 tx.utils.write_paired_text(
                     refs.squeeze(), hyps,
-                    os.path.join(config.sample_path, 'val.%d'%epoch),
+                    os.path.join(config.sample_path, 'val.%d' % epoch),
                     append=True, mode='v')
 
             except tf.errors.OutOfRangeError:
@@ -165,7 +163,7 @@ def _main(_):
 
         gamma_ = 1.
         lambda_g_ = 0.
-        for epoch in range(1, config.max_nepochs+1):
+        for epoch in range(1, config.max_nepochs + 1):
             if epoch > config.pretrain_nepochs:
                 # Anneals the gumbel-softmax temperature
                 gamma_ = max(0.001, gamma_ * config.gamma_decay)
@@ -186,6 +184,7 @@ def _main(_):
             # Test
             iterator.restart_dataset(sess, 'test')
             _eval_epoch(sess, gamma_, lambda_g_, epoch, 'test')
+
 
 if __name__ == '__main__':
     tf.app.run(main=_main)

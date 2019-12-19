@@ -13,16 +13,13 @@
 # limitations under the License.
 """Attentional Seq2seq trained with policy gradient.
 """
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import division
 
-#pylint: disable=invalid-name, too-many-arguments, too-many-locals
+# pylint: disable=invalid-name, too-many-arguments, too-many-locals
 
 import importlib
 import numpy as np
 import tensorflow as tf
-import texar as tx
+import texar.tf as tx
 
 flags = tf.flags
 
@@ -34,7 +31,7 @@ FLAGS = flags.FLAGS
 config_model = importlib.import_module(FLAGS.config_model)
 config_data = importlib.import_module(FLAGS.config_data)
 
-# A caveats of using `texar.agents.SeqPGAgent`:
+# A caveats of using `texar.tf.agents.SeqPGAgent`:
 # The training data iterator should not run to raise `OutOfRangeError`,
 # otherwise the iterator cannot be re-initialized and may raise
 # `CancelledError`. This is probably because the iterator is used by
@@ -42,9 +39,10 @@ config_data = importlib.import_module(FLAGS.config_data)
 #
 # A simple workaround is to set `'num_epochs'` of training data to a large
 # number so that its iterator will never run into `OutOfRangeError`. Use
-# `texar.data.FeedableDataIterator` to periodically switch to dev/test data
+# `texar.tf.data.FeedableDataIterator` to periodically switch to dev/test data
 # for evaluation and switch back to the training data to resume from the
 # breakpoint.
+
 
 def build_model(batch, train_data):
     """Assembles the seq2seq model.
@@ -199,6 +197,7 @@ def main():
         agent.sess = sess
 
         _train_and_eval(sess, agent)
+
 
 if __name__ == '__main__':
     main()

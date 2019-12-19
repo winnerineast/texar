@@ -14,17 +14,14 @@
 """
 Policy gradient for the CartPole game in OpenAI gym.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 # pylint: disable=invalid-name
 
 import importlib
 import gym
 import tensorflow as tf
-import texar as tx
-from texar.agents import PGAgent
+import texar.tf as tx
+from texar.tf.agents import PGAgent
 
 
 flags = tf.flags

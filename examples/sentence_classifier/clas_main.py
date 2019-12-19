@@ -19,13 +19,10 @@ To run:
 
 $ python clas_main.py --config=config_kim
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import importlib
 import tensorflow as tf
-import texar as tx
+import texar.tf as tx
 
 # pylint: disable=invalid-name, too-many-locals
 
@@ -36,6 +33,7 @@ flags.DEFINE_string("config", "config_kim", "The config to use.")
 FLAGS = flags.FLAGS
 
 config = importlib.import_module(FLAGS.config)
+
 
 def _main(_):
     # Data
@@ -103,7 +101,7 @@ def _main(_):
             iterator.switch_to_val_data(sess)
             val_accu = _run_epoch(sess, tf.estimator.ModeKeys.EVAL, epoch)
             tf.logging.info('epoch: {0:2} train accu: {1:.4f} val accu: {2:.4f}'
-                            .format(epoch+1, train_accu, val_accu))
+                            .format(epoch + 1, train_accu, val_accu))
             # Test
             if val_accu > best_val_accu:
                 best_val_accu = val_accu
@@ -111,6 +109,7 @@ def _main(_):
                 iterator.switch_to_test_data(sess)
                 test_accu = _run_epoch(sess, tf.estimator.ModeKeys.EVAL)
                 tf.logging.info('test accu: {0:.4f}'.format(test_accu))
+
 
 if __name__ == '__main__':
     tf.logging.set_verbosity(tf.logging.INFO)
